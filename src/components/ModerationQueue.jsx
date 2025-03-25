@@ -18,7 +18,7 @@ const ModerationQueue = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await fetch("http://localhost:8000/flagged");
+        const response = await fetch("https://backend-14zy.onrender.com/flagged");
         if (!response.ok) {
           throw new Error("Failed to fetch posts");
         }

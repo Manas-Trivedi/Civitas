@@ -17,7 +17,7 @@ const Dashboard = () => {
   const fetchPosts = async (subreddit) => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/fetch-reddit?subreddit=${subreddit}&limit=5`);
+      const response = await fetch(`https://backend-14zy.onrender.com/api/fetch-reddit?subreddit=${subreddit}&limit=5`);
       if (!response.ok) {
         throw new Error("Failed to fetch Reddit posts");
       }
