@@ -32,7 +32,7 @@ Follow these steps to set up and run the project locally:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/civitas.git
+   git clone https://github.com/Manas-Trivedi/civitas.git
    cd civitas
    ```
 
