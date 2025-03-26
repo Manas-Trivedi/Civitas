@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { SortAsc, SortDesc } from "lucide-react"; // Import icons
 import "./ModerationQueue.css";
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Title, Tooltip, Legend } from 'chart.js';
@@ -8,6 +9,7 @@ ChartJS.register(ArcElement, Title, Tooltip, Legend);
 const ModerationQueue = () => {
   const [flaggedPosts, setFlaggedPosts] = useState([]);
   const [unflaggedPosts, setUnflaggedPosts] = useState([]);
+  const [sortOrder, setSortOrder] = useState("desc"); // Default sort order
 
   const getUnflaggedClass = (score) => {
     if (score <= 40) return "green"; // Clean
@@ -56,16 +58,34 @@ const ModerationQueue = () => {
     };
   };
 
+  const sortPosts = (posts) => {
+    return [...posts].sort((a, b) => {
+      const dateA = new Date(a.timestamp);
+      const dateB = new Date(b.timestamp);
+      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+    });
+  };
+
   return (
     <div className="moderation-queue">
       <h1>Moderation Queue</h1>
+
+      <div className="sort-container">
+        <button
+          className="sort-button"
+          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+        >
+          {sortOrder === "asc" ? <SortAsc size={20} /> : <SortDesc size={20} />}
+          <span className="sort-text">Sort by Time</span>
+        </button>
+      </div>
 
       <h2>Flagged Posts</h2>
       {flaggedPosts.length === 0 ? (
         <p>No flagged posts available.</p>
       ) : (
         <div className="card-container">
-          {flaggedPosts.map((post, index) => (
+          {sortPosts(flaggedPosts).map((post, index) => (
             <div key={index} className="card flagged">
               <div className="post-details">
                 <h3>{post.label}</h3>
@@ -84,7 +104,7 @@ const ModerationQueue = () => {
         <p>No unflagged posts available.</p>
       ) : (
         <div className="card-container">
-          {unflaggedPosts.map((post, index) => {
+          {sortPosts(unflaggedPosts).map((post, index) => {
             const score = post.gemini_sentiment?.score || 0;
             const sentimentClass = getUnflaggedClass(score);
             const statusText =

@@ -16,18 +16,29 @@ const Dashboard = () => {
 
   const fetchPosts = async (subreddit) => {
     setLoading(true);
-    try {
-      const response = await fetch(`https://backend-14zy.onrender.com/api/fetch-reddit?subreddit=${subreddit}&limit=5`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch Reddit posts");
+
+    const maxRetries = 3;  // Retry up to 3 times
+    let attempt = 0;
+
+    while (attempt < maxRetries) {
+      try {
+        const response = await fetch(`https://backend-14zy.onrender.com/api/fetch-reddit?subreddit=${subreddit}&limit=5`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch Reddit posts: ${response.status}`);
+        }
+        const data = await response.json();
+        setPosts(data.posts);
+        break;  // Exit the loop if successful
+      } catch (error) {
+        console.error(`Error fetching posts (attempt ${attempt + 1}):`, error);
+        attempt++;
+
+        // Wait before retrying (exponential backoff)
+        await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
       }
-      const data = await response.json();
-      setPosts(data.posts);
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   useEffect(() => {

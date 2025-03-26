@@ -121,3 +121,66 @@
 .filter-sort-container button:hover {
   background-color: #0056b3;
 }
+
+.sort-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sort-label {
+  font-size: 16px;
+  font-weight: bold;
+  margin-right: 10px;
+  color: #333;
+}
+
+.sort-dropdown {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  color: #333;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.sort-dropdown:focus {
+  border-color: #007bff;
+}
+
+.sort-dropdown:hover {
+  border-color: #007bff;
+  cursor: pointer;
+}
+
+.sort-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.sort-button {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.sort-button:hover {
+  background-color: #e6e6e6;
+  border-color: #007bff;
+}
+
+.sort-text {
+  margin-left: 8px;
+  font-weight: bold;
+  color: #333;
+}
