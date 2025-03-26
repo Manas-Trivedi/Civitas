@@ -15,7 +15,7 @@ const Evaluation = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("https://backend-14zy.onrender.com/analyze", {
+      const res = await fetch("https://civitas-backend.onrender.com/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),

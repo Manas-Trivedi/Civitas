@@ -20,7 +20,7 @@ const ModerationQueue = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await fetch("https://backend-14zy.onrender.com/flagged");
+        const response = await fetch("https://civitas-backend.onrender.com/flagged");
         if (!response.ok) {
           throw new Error("Failed to fetch posts");
         }

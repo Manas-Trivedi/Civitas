@@ -22,7 +22,7 @@ const Dashboard = () => {
 
     while (attempt < maxRetries) {
       try {
-        const response = await fetch(`https://backend-14zy.onrender.com/api/fetch-reddit?subreddit=${subreddit}&limit=5`);
+        const response = await fetch(`https://civitas-backend.onrender.com/api/fetch-reddit?subreddit=${subreddit}&limit=5`);
         if (!response.ok) {
           throw new Error(`Failed to fetch Reddit posts: ${response.status}`);
         }
