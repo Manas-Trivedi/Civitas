@@ -17,6 +17,7 @@
 }
 
 .card {
+  position: relative; /* Add relative positioning for the card container */
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 16px;
@@ -24,6 +25,25 @@
   display: flex;
   flex-direction: column;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease-in-out; /* Smooth hover effect */
+}
+
+.card:hover {
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Slight shadow on hover */
+}
+
+.trash-icon {
+  position: absolute;  /* Absolute positioning inside the card */
+  top: 10px;           /* Move it towards the top */
+  right: 10px;         /* Move it towards the right */
+  color: #999;         /* Light gray color */
+  cursor: pointer;     /* Indicate clickable */
+  z-index: 10;         /* Ensure it’s above other content */
+  transition: color 0.2s;
+}
+
+.trash-icon:hover {
+  color: red;          /* Red on hover */
 }
 
 .card-content {
@@ -186,4 +206,10 @@
   margin-left: 8px;
   font-weight: bold;
   color: #333;
+}
+
+.header-container {
+  display: flex;
+  justify-content: flex-end; /* Align to the right */
+  margin-bottom: 1rem;
 }

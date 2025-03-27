@@ -98,7 +98,6 @@ const Evaluation = () => {
           {/* Flagged Post */}
           {response.label === "LABEL_1" ? (
             <div className="card flagged-card" style={{ textAlign: "center", padding: "20px" }}>
-              <Trash className="trash-icon" /> {/* Add trash icon here */}
               <h2 className="card-title">🚩 Flagged Post</h2>
               <p>This post was flagged by MetaHateBERT for hate speech.</p>
               <div className="score-section" style={{ display: "flex", justifyContent: "center" }}>

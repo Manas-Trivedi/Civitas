@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SortAsc, SortDesc } from "lucide-react"; // Import icons
+import { SortAsc, SortDesc, Trash2 } from "lucide-react"; // Import icons
 import "./ModerationQueue.css";
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Title, Tooltip, Legend } from 'chart.js';
@@ -66,18 +66,36 @@ const ModerationQueue = () => {
     });
   };
 
+  const deletePost = async (postId) => {
+    try {
+      const response = await fetch(`https://civitas-backend.onrender.com/flagged/${postId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete post");
+      }
+      // Update the UI by removing the deleted post
+      setFlaggedPosts((prev) => prev.filter((post) => post.id !== postId));
+      setUnflaggedPosts((prev) => prev.filter((post) => post.id !== postId));
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
+
   return (
     <div className="moderation-queue">
       <h1>Moderation Queue</h1>
 
-      <div className="sort-container">
-        <button
-          className="sort-button"
-          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-        >
-          {sortOrder === "asc" ? <SortAsc size={20} /> : <SortDesc size={20} />}
-          <span className="sort-text">Sort by Time</span>
-        </button>
+      <div className="header-container">
+        <div className="sort-container">
+          <button
+            className="sort-button"
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+          >
+            {sortOrder === "asc" ? <SortAsc size={20} /> : <SortDesc size={20} />}
+            <span className="sort-text">Sort by Time</span>
+          </button>
+        </div>
       </div>
 
       <h2>Flagged Posts</h2>
@@ -88,6 +106,11 @@ const ModerationQueue = () => {
           {sortPosts(flaggedPosts).map((post, index) => (
             <div key={index} className="card flagged">
               <div className="post-details">
+                <Trash2
+                  className="trash-icon"
+                  size={16}
+                  onClick={() => deletePost(post.id)} // Add delete functionality
+                />
                 <h3>{post.label}</h3>
                 <p>{post.text}</p>
                 <p>Score: {post.score.toFixed(2)}</p>
@@ -117,6 +140,11 @@ const ModerationQueue = () => {
               <div key={index} className={`card unflagged ${sentimentClass}`}>
                 <div className="card-content">
                   <div className="post-details">
+                    <Trash2
+                      className="trash-icon"
+                      size={16}
+                      onClick={() => deletePost(post.id)} // Add delete functionality
+                    />
                     <h3>Sentiment: {post.gemini_sentiment?.sentiment || "N/A"}</h3>
                     <p>{post.text}</p>
                     <p>Status: <span className={`status ${sentimentClass}`}>{statusText}</span></p>
