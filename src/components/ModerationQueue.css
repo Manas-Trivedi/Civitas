@@ -65,16 +65,19 @@
 .card.unflagged.green {
   background-color: #e6ffe6; /* Light green background for clean posts */
   border-left: 5px solid green; /* Green border for emphasis */
+  color: green; /* Explicit black font color for visibility */
 }
 
 .card.unflagged.yellow {
   background-color: #fffbe6; /* Light yellow background for borderline posts */
   border-left: 5px solid yellow; /* Yellow border for emphasis */
+  color: #b59f00; /* Darker yellow font color for better visibility */
 }
 
 .card.unflagged.red {
   background-color: #ffe6e6; /* Light red background for severely hateful posts */
   border-left: 5px solid red; /* Red border for emphasis */
+  color: red; /* Explicit black font color for visibility */
 }
 
 .status-flagged {
