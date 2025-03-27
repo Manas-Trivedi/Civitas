@@ -10,6 +10,10 @@ const ModerationQueue = () => {
   const [flaggedPosts, setFlaggedPosts] = useState([]);
   const [unflaggedPosts, setUnflaggedPosts] = useState([]);
   const [sortOrder, setSortOrder] = useState("desc"); // Default sort order
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [postToDelete, setPostToDelete] = useState(null);
+  const [isFlaggedCollapsed, setIsFlaggedCollapsed] = useState(false);
+  const [isUnflaggedCollapsed, setIsUnflaggedCollapsed] = useState(false);
 
   const getUnflaggedClass = (score) => {
     if (score <= 40) return "green"; // Clean
@@ -67,6 +71,10 @@ const ModerationQueue = () => {
   };
 
   const deletePost = async (postId) => {
+    // Optimistically update the UI
+    setFlaggedPosts((prev) => prev.filter((post) => post.post_id !== postId));
+    setUnflaggedPosts((prev) => prev.filter((post) => post.post_id !== postId));
+
     try {
       const response = await fetch(`https://civitas-backend.onrender.com/flagged/${postId}`, {
         method: "DELETE",
@@ -74,13 +82,46 @@ const ModerationQueue = () => {
       if (!response.ok) {
         throw new Error("Failed to delete post");
       }
-      // Update the UI by removing the deleted post
-      setFlaggedPosts((prev) => prev.filter((post) => post.id !== postId));
-      setUnflaggedPosts((prev) => prev.filter((post) => post.id !== postId));
     } catch (error) {
       console.error("Error deleting post:", error);
+      // Revert the UI changes if the API call fails
+      await fetchPosts(); // Re-fetch posts to restore the correct state
     }
   };
+
+  const openConfirmModal = (postId) => {
+    setPostToDelete(postId);
+    setShowConfirmModal(true);
+  };
+
+  const closeConfirmModal = () => {
+    setShowConfirmModal(false);
+    setPostToDelete(null);
+  };
+
+  const handleDelete = async () => {
+    if (postToDelete) {
+      await deletePost(postToDelete);
+      closeConfirmModal();
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (showConfirmModal) {
+        if (event.key === "Enter") {
+          handleDelete(); // Confirm deletion on Enter key press
+        } else if (event.key === "Escape") {
+          closeConfirmModal(); // Close modal on Escape key press
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [showConfirmModal, postToDelete]);
 
   return (
     <div className="moderation-queue">
@@ -98,72 +139,97 @@ const ModerationQueue = () => {
         </div>
       </div>
 
-      <h2>Flagged Posts</h2>
-      {flaggedPosts.length === 0 ? (
-        <p>No flagged posts available.</p>
-      ) : (
-        <div className="card-container">
-          {sortPosts(flaggedPosts).map((post, index) => (
-            <div key={index} className="card flagged">
-              <div className="post-details">
-                <Trash2
-                  className="trash-icon"
-                  size={16}
-                  onClick={() => deletePost(post.id)} // Add delete functionality
-                />
-                <h3>{post.label}</h3>
-                <p>{post.text}</p>
-                <p>Score: {post.score.toFixed(2)}</p>
-                <p>Status: <span className="status flagged">Explicit hate speech flagged by MetaHateBERT</span></p>
-                <p>Timestamp: {post.timestamp}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <h2>Unflagged Posts</h2>
-      {unflaggedPosts.length === 0 ? (
-        <p>No unflagged posts available.</p>
-      ) : (
-        <div className="card-container">
-          {sortPosts(unflaggedPosts).map((post, index) => {
-            const score = post.gemini_sentiment?.score || 0;
-            const sentimentClass = getUnflaggedClass(score);
-            const statusText =
-              score <= 40
-                ? "Positive sentiment"
-                : score <= 70
-                ? "Neutral sentiment"
-                : "Negative sentiment";
-            return (
-              <div key={index} className={`card unflagged ${sentimentClass}`}>
-                <div className="card-content">
+      <div className="collapsible-box">
+        <h2 onClick={() => setIsFlaggedCollapsed(!isFlaggedCollapsed)} className="collapsible-header">
+          Flagged Posts {isFlaggedCollapsed ? "▼" : "▲"}
+        </h2>
+        {!isFlaggedCollapsed && (
+          flaggedPosts.length === 0 ? (
+            <p className="empty-message">No flagged posts available.</p>
+          ) : (
+            <div className="card-container">
+              {sortPosts(flaggedPosts).map((post, index) => (
+                <div key={index} className="card flagged">
                   <div className="post-details">
                     <Trash2
                       className="trash-icon"
                       size={16}
-                      onClick={() => deletePost(post.id)} // Add delete functionality
+                      onClick={() => openConfirmModal(post.post_id)} // Open custom modal
                     />
-                    <h3>Sentiment: {post.gemini_sentiment?.sentiment || "N/A"}</h3>
+                    <h3>{post.label}</h3>
                     <p>{post.text}</p>
-                    <p>Status: <span className={`status ${sentimentClass}`}>{statusText}</span></p>
+                    <p>Score: {post.score.toFixed(2)}</p>
+                    <p>Status: <span className="status flagged">Explicit hate speech flagged by MetaHateBERT</span></p>
                     <p>Timestamp: {post.timestamp}</p>
                   </div>
-                  <div className="chart-container">
-                    <Doughnut
-                      data={getChartData(score)}
-                      options={{
-                        responsive: true,
-                        cutout: '80%', // Reduce the size of the donut chart
-                        plugins: { legend: { display: false } }
-                      }}
-                    />
-                  </div>
                 </div>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+          )
+        )}
+      </div>
+
+      <div className="collapsible-box">
+        <h2 onClick={() => setIsUnflaggedCollapsed(!isUnflaggedCollapsed)} className="collapsible-header">
+          Unflagged Posts {isUnflaggedCollapsed ? "▼" : "▲"}
+        </h2>
+        {!isUnflaggedCollapsed && (
+          unflaggedPosts.length === 0 ? (
+            <p className="empty-message">No unflagged posts available.</p>
+          ) : (
+            <div className="card-container">
+              {sortPosts(unflaggedPosts).map((post, index) => {
+                const score = post.gemini_sentiment?.score || 0;
+                const sentimentClass = getUnflaggedClass(score);
+                const statusText =
+                  score <= 40
+                    ? "Positive sentiment"
+                    : score <= 70
+                    ? "Neutral sentiment"
+                    : "Negative sentiment";
+                return (
+                  <div key={index} className={`card unflagged ${sentimentClass}`}>
+                    <div className="card-content">
+                      <div className="post-details">
+                        <Trash2
+                          className="trash-icon"
+                          size={16}
+                          onClick={() => openConfirmModal(post.post_id)} // Open custom modal
+                        />
+                        <h3>Sentiment: {post.gemini_sentiment?.sentiment || "N/A"}</h3>
+                        <p>{post.text}</p>
+                        <p>Status: <span className={`status ${sentimentClass}`}>{statusText}</span></p>
+                        <p>Timestamp: {post.timestamp}</p>
+                      </div>
+                      <div className="chart-container">
+                        <Doughnut
+                          data={getChartData(score)}
+                          options={{
+                            responsive: true,
+                            cutout: '80%', // Reduce the size of the donut chart
+                            plugins: { legend: { display: false } }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )
+        )}
+      </div>
+
+      {showConfirmModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+            <div className="modal-buttons">
+              <button className="confirm-button" onClick={handleDelete}>Delete</button>
+              <button className="cancel-button" onClick={closeConfirmModal}>Cancel</button>
+            </div>
+          </div>
         </div>
       )}
     </div>
