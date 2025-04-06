@@ -13,8 +13,10 @@ const decodeEntities = (str) => {
 const Dashboard = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedSubreddit, setSelectedSubreddit] = useState("confessions");
 
   const fetchPosts = async (subreddit) => {
+    setSelectedSubreddit(subreddit);
     setLoading(true);
 
     const maxRetries = 3;  // Retry up to 3 times
@@ -54,13 +56,22 @@ const Dashboard = () => {
       <div className="form-section">
         <label className="custom-font">Latest Subreddit Posts</label>
         <div className="poll-type-options">
-          <button className="poll-type-btn" onClick={() => fetchPosts("confessions")}>
+          <button
+            className={`poll-type-btn ${selectedSubreddit === "confessions" ? "selected" : ""}`}
+            onClick={() => fetchPosts("confessions")}
+          >
             <Menu size={16} /> r/confessions
           </button>
-          <button className="poll-type-btn" onClick={() => fetchPosts("india")}>
+          <button
+            className={`poll-type-btn ${selectedSubreddit === "india" ? "selected" : ""}`}
+            onClick={() => fetchPosts("india")}
+          >
             <Smile size={16} /> r/india
           </button>
-          <button className="poll-type-btn" onClick={() => fetchPosts("technology")}>
+          <button
+            className={`poll-type-btn ${selectedSubreddit === "technology" ? "selected" : ""}`}
+            onClick={() => fetchPosts("technology")}
+          >
             <Hash size={16} /> r/technology
           </button>
         </div>

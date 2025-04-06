@@ -53,8 +53,9 @@ label {
 }
 
 .poll-type-btn.selected {
-    background: #4a90e2; /* Updated to match app's primary color */
+    background: #6a0dad; /* Purple accent */
     color: white;
+    border-color: #6a0dad; /* Match border with background */
 }
 
 .options-list {
