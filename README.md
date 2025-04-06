@@ -2,6 +2,8 @@
 
 Civitas is a modern web application designed to empower communities by providing tools for discussion moderation, sentiment analysis, and user management. Built with React and Vite, Civitas offers a seamless and responsive user experience.
 
+### The backend for this project is located at: [Civitas Backend](https://github.com/Manas-Trivedi/civitas-backend).
+
 ## Features
 
 - **Dashboard**: View and fetch the latest posts from various subreddits.
